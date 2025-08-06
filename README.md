@@ -2,69 +2,96 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-## Available Scripts
++-----------+        +-------------+       +-----------------+       +--------------+
+|           |        |             |       |                 |       |              |
+|  Jenkins  +------->+   GitHub    +------>+   Docker Build  +------>+  Docker Hub  |
+|           |        |             |       |                 |       |              |
++-----+-----+        +-------------+       +--------+--------+       +------+-------+
+      |                                                  |                  |
+      |                                                  |                  v
+      |                                                  |          +-------+------+
+      |                                                  |          |              |
+      +--------------------------------------------------+--------->+   Podman     |
+                                                                     |  (Run App)   |
+                                                                     +--------------+
 
-In the project directory, you can run:
 
-### `npm start`
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
 
-### `npm test`
+Jenkins CI/CD Pipeline Setup.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## 🚀 CI/CD Pipeline – Jenkins, GitHub, Docker Hub, and Podman
 
-### `npm run build`
+### 🔄 Pipeline Flow
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+1. Jenkins triggers a pipeline.
+2. Source code is pulled from GitHub.
+3. Jenkins builds a Docker image from the codebase.
+4. The Docker image is pushed to Docker Hub.
+5. Jenkins then pulls the same image from Docker Hub using Podman.
+6. Jenkins runs the container in Podman on a desired port.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### 📦 Tools Used
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+- **Jenkins** – Orchestrates the entire CI/CD process.
+- **GitHub** – Source code repository.
+- **Docker** – Used to build and tag the image.
+- **Docker Hub** – Docker image registry.
+- **Podman** – Used to run the final container in production.
 
-### `npm run eject`
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
 
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+pipeline{
+    agent any
+    tools{
+        jdk 'jdk17'
+        nodejs 'node16'
+    }
+    stages {
+        stage('clean workspace'){
+            steps{
+                cleanWs()
+            }
+        }
+        stage('Checkout from Git'){
+            steps{
+                git branch: 'main', url: 'https://github.com/Suhanson-alto/Fedorg.git'
+            }
+        }
+        stage('Install Dependencies') {
+            steps {
+                bat "npm install"
+            }
+        }
+        stage("Docker Build & Push"){
+            steps{
+                script{
+                   withCredentials([usernamePassword(credentialsId: 'docker', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {   
+                       bat "docker build -t fedorgg1 ."
+                       bat "docker tag fedorgg1 suhanson/fedorg:latest "
+                       bat "docker push suhanson/fedorg:latest "
+                    }   
+                }
+            }
+        }
+	    stage('Pull Image') {
+      	    steps {
+        	bat 'podman pull suhanson/fedorg:latest'
+      		}
+    	}
+    	stage('Run Container') {
+      	    steps {
+        	bat 'podman run --name test-nginx -d -p 9006:80 suhanson/fedorg:latest'
+      		}
+    	}
+    	stage('List Running Containers') {
+      	    steps {
+        	bat 'podman ps'
+      		}
+    	}
+    }
+}
