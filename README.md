@@ -92,6 +92,11 @@ Test in PowerShell: podman --version
 <img width="940" height="511" alt="image" src="https://github.com/user-attachments/assets/b3899baf-eb54-4aa1-b4e0-e3fef83f2d44" />
 
 
+<img width="940" height="331" alt="image" src="https://github.com/user-attachments/assets/de3eb1d7-346b-44c7-80dd-7a50e1f85c05" />
+
+<img width="940" height="230" alt="image" src="https://github.com/user-attachments/assets/c9017afc-cea4-4636-8d6d-abf7a4c3893a" />
+
+
 
 pipeline{
     agent any
