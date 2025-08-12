@@ -50,6 +50,7 @@ We’ll need Java, Jenkins, Docker, Podman, and Git installed on Local Machine
 	https://www.jenkins.io/download/
 	Run installer, choose Run as a service.
  	After install, Jenkins runs at: http://localhost:8080
+
 **Step 4 – Install Docker Desktop for Windows**
 	https://www.docker.com/products/docker-desktop/
 	Enable "Use the WSL 2 based engine" in Docker Desktop settings (even if you don’t use WSL directly).
