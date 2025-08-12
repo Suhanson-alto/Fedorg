@@ -88,6 +88,21 @@ Test in PowerShell: podman --version
 **Notes for Windows:**
 	bat is used instead of sh for Windows batch commands.
 	If you use PowerShell, replace bat with powershell steps.
+
+
+
+
+
+**Sometimes, there will be connection issue between jenkins and podman desktop**
+
+	Cannot connect to Podman. Please verify your connection to the Linux system using `podman system connection list`, or try `podman machine init` and `podman 	machine start` to manage a new Linux VM
+	Error: unable to connect to Podman socket: Get "http://d/v5.5.2/libpod/_ping": dial unix /run/podman/podman.sock: connect: A socket operation encountered a 	dead network.
+
+
+Make sure to troubleshoot on podman side.
+if your podman is using under wsl, make sure to install ubuntu in wsl and sudo apt get podman. 
+
+
  ___________________________________________________________________________________________________________________________________________________
 
 <img width="940" height="511" alt="image" src="https://github.com/user-attachments/assets/b3899baf-eb54-4aa1-b4e0-e3fef83f2d44" />
