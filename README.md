@@ -114,6 +114,12 @@ if your podman is using under wsl, make sure to install ubuntu in wsl and sudo a
 
 
 
+View this in code mode. 
+
+configure this code in jenkins pipeline and run the job.
+
+
+
 pipeline{
     agent any
     tools{
